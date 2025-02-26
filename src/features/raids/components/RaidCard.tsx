@@ -1,8 +1,9 @@
-import { format, isBefore } from "date-fns";
-import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import classNames from "classnames";
+import { format, isBefore, parse } from "date-fns";
+import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { z } from "zod";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -32,17 +32,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useToast } from "@/hooks/use-toast";
 
-const RaidSchema = z.object({
-  _id: z.string(),
-  date: z.string(),
-  platform: z.string(),
-  url: z.string(),
-  shareMessage: z.string(),
-  content: z.string(),
-});
-
-type Raid = z.infer<typeof RaidSchema>;
+import { Raid } from "../api/getRaids";
+import { useUpdateRaid } from "../api/updateRaid";
 
 const RaidCard = ({
   _id,
@@ -52,19 +45,96 @@ const RaidCard = ({
   shareMessage,
   content,
 }: Raid) => {
+  const { toast } = useToast();
+  const { mutate: updateRaidMutate, isSuccess, isError } = useUpdateRaid();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (isSuccess) {
+      queryClient.invalidateQueries({ queryKey: ["raids"] });
+
+      toast({
+        title: "Raid atualizado com sucesso!",
+        description: "O raid foi atualizado com sucesso.",
+      });
+    }
+
+    if (isError) {
+      toast({
+        title: "Erro ao atualizar Raid.",
+        description: "Tente novamente mais tarde.",
+      });
+    }
+  }, [isSuccess, isError]);
+
   const formattedDate = format(new Date(date), "dd/MM/yyyy");
   const isPast = isBefore(new Date(date), new Date());
+  const isToday =
+    format(new Date(date), "dd/MM/yyyy") === format(new Date(), "dd/MM/yyyy");
 
-  const [editedContent, setContent] = useState(content);
+  const [editedRaid, setEditedRaid] = useState({
+    _id,
+    platform,
+    date: formattedDate,
+    url,
+    shareMessage,
+    content,
+  });
+
+  const onChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setEditedRaid((prev) => ({
+      ...prev,
+      [event.target.id]: event.target.value,
+    }));
+  };
+
+  const updateRaid = () => {
+    if (
+      !editedRaid._id ||
+      !editedRaid.platform ||
+      !editedRaid.date ||
+      !editedRaid.url ||
+      !editedRaid.shareMessage ||
+      !editedRaid.content
+    ) {
+      toast({
+        title: "Preencha todos os campos.",
+        description: "Todos os campos são obrigatórios.",
+      });
+      return;
+    }
+
+    const parsedDate = parse(editedRaid.date, "dd/MM/yyyy", new Date());
+    if (isNaN(parsedDate.getTime())) {
+      toast({
+        title: "Data inválida.",
+        description: "Por favor, insira uma data válida no formato dd/MM/yyyy.",
+      });
+      return;
+    }
+
+    updateRaidMutate({
+      ...editedRaid,
+      date: parsedDate.toISOString(),
+    });
+  };
 
   return (
     <Sheet>
       <SheetTrigger asChild>
         <Card className="h-32 select-none min-h-32 w-80 hover:cursor-pointer">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>{platform}</span>
-              <Badge variant={isPast ? "destructive" : "outline"}>
+            <CardTitle className="flex items-center justify-between space-x-2">
+              <span className="truncate max-w-fit grow">{platform}</span>
+              <Badge
+                variant={isPast ? "destructive" : "outline"}
+                className={classNames({
+                  "bg-[#306844] text-[hsl(var(--success-foreground))] transition-colors hover:bg-[#2c4c3b]":
+                    isToday,
+                })}
+              >
                 {formattedDate}
               </Badge>
             </CardTitle>
@@ -92,32 +162,53 @@ const RaidCard = ({
       {/* Sheet com formulário */}
       <SheetContent className="w-[400px] overflow-y-auto sm:w-[540px]">
         <SheetHeader>
-          <SheetTitle className="select-none">Detalhes do Raid</SheetTitle>
+          <SheetTitle className="select-none">Editar Raid</SheetTitle>
         </SheetHeader>
         <div className="min-h-full px-1 mt-4 space-y-4">
           <div className="space-y-1">
             <Label className="select-none">Plataforma</Label>
-            <Input value={platform} className="rounded-xl" />
+            <Input
+              id="platform"
+              onChange={onChange}
+              value={editedRaid.platform}
+              className="rounded-xl"
+            />
           </div>
           <div className="space-y-1">
             <Label className="select-none">Data</Label>
-            <Input value={formattedDate} className="rounded-xl" />
+            <Input
+              id="date"
+              onChange={onChange}
+              value={formattedDate}
+              className="rounded-xl"
+            />
           </div>
           <div className="space-y-1">
             <Label className="select-none">URL</Label>
-            <Input value={url} className="rounded-xl" />
+            <Input
+              id="url"
+              onChange={onChange}
+              value={editedRaid.url}
+              className="rounded-xl"
+            />
           </div>
           <div className="space-y-1">
             <Label className="select-none">Mensagem</Label>
-            <Input value={shareMessage} className="rounded-xl" />
+            <Input
+              id="shareMessage"
+              onChange={onChange}
+              value={editedRaid.shareMessage}
+              className="rounded-xl"
+            />
           </div>
           <div className="space-y-1">
             <Label className="select-none">Conteúdo</Label>
 
             <Textarea
+              id="content"
               className="w-full h-48 p-2 text-sm rounded-xl"
-              value={editedContent}
-              onChange={(e) => setContent(e.target.value)}
+              value={editedRaid.content}
+              onChange={onChange}
               placeholder="Type your markdown here..."
             />
           </div>
@@ -126,15 +217,17 @@ const RaidCard = ({
             <Label className="select-none">Pré visualização</Label>
             <div className="mt-3 max-h-[500px] select-none overflow-y-auto rounded-xl border border-[hsl(var(--border))] p-3">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {editedContent}
+                {editedRaid.content}
               </ReactMarkdown>
             </div>
           </div>
         </div>
 
-        <SheetFooter className="pt-4 mt-auto select-none">
+        <SheetFooter className="pt-4 pr-1 mt-auto select-none">
           <SheetClose asChild>
-            <Button type="submit">Enviar</Button>
+            <Button type="submit" className="rounded-xl" onClick={updateRaid}>
+              Enviar
+            </Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>
