@@ -11,12 +11,7 @@ export default {
         },
       },
       animation: {
-        wiggle: "wiggle 1s ease-in-out infinite", 
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        wiggle: "wiggle 1s ease-in-out infinite",
       },
       colors: {
         background: "hsl(var(--background))",

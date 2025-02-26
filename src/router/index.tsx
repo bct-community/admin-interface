@@ -11,12 +11,9 @@ export const Router = () => {
       <AuthProvider>
         <ScrollToTop />
         <Routes>
-          <Route path="/" element={<Login />} />
+          {/* <Route path="/" element={<Login />} /> */}
 
-          <Route
-            path="/raids"
-            element={<ProtectedRoute element={<Raids />} />}
-          />
+          <Route path="/" element={<Raids />} />
           <Route
             path="/links"
             element={<ProtectedRoute element={<Links />} />}
