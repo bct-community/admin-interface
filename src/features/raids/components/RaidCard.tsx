@@ -14,6 +14,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -34,6 +40,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 
+import { useDeleteRaid } from "../api/deleteRaid";
 import { Raid } from "../api/getRaids";
 import { useUpdateRaid } from "../api/updateRaid";
 
@@ -46,11 +53,21 @@ const RaidCard = ({
   content,
 }: Raid) => {
   const { toast } = useToast();
-  const { mutate: updateRaidMutate, isSuccess, isError } = useUpdateRaid();
+  const {
+    mutate: updateRaidMutate,
+    isSuccess: isSuccessUpdatingRaid,
+    isError: isErrorUpdatingRaid,
+  } = useUpdateRaid();
+  const {
+    mutate: deleteRaidMutate,
+    isSuccess: isSuccessDeletingRaid,
+    isError: isErrorDeletingRaid,
+  } = useDeleteRaid();
+
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccessUpdatingRaid) {
       queryClient.invalidateQueries({ queryKey: ["raids"] });
 
       toast({
@@ -59,13 +76,31 @@ const RaidCard = ({
       });
     }
 
-    if (isError) {
+    if (isErrorUpdatingRaid) {
       toast({
         title: "Erro ao atualizar Raid.",
         description: "Tente novamente mais tarde.",
       });
     }
-  }, [isSuccess, isError]);
+  }, [isSuccessUpdatingRaid, isErrorUpdatingRaid]);
+
+  useEffect(() => {
+    if (isSuccessDeletingRaid) {
+      queryClient.invalidateQueries({ queryKey: ["raids"] });
+
+      toast({
+        title: "Raid removido com sucesso!",
+        description: "O raid foi removido com sucesso.",
+      });
+    }
+
+    if (isErrorDeletingRaid) {
+      toast({
+        title: "Erro ao remover Raid.",
+        description: "Tente novamente mais tarde.",
+      });
+    }
+  }, [isSuccessDeletingRaid, isErrorDeletingRaid]);
 
   const formattedDate = format(new Date(date), "dd/MM/yyyy");
   const isPast = isBefore(new Date(date), new Date());
@@ -123,48 +158,57 @@ const RaidCard = ({
 
   return (
     <Sheet>
-      <SheetTrigger asChild>
-        <Card className="h-32 select-none min-h-32 w-80 hover:cursor-pointer">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between space-x-2">
-              <span className="truncate max-w-fit grow">{platform}</span>
-              <Badge
-                variant={isPast ? "destructive" : "outline"}
-                className={classNames({
-                  "bg-[#306844] text-[hsl(var(--success-foreground))] transition-colors hover:bg-[#2c4c3b]":
-                    isToday,
-                })}
-              >
-                {formattedDate}
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CardDescription className="w-80 max-w-80">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger className="pr-10 truncate max-w-80">
-                    {shareMessage}
-                  </TooltipTrigger>
-                  <TooltipContent
-                    align="start"
-                    className="select-none max-w-80"
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <SheetTrigger asChild>
+            <Card className="h-32 min-h-32 w-80 select-none hover:cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between space-x-2">
+                  <span className="max-w-fit grow truncate">{platform}</span>
+                  <Badge
+                    variant={isPast ? "destructive" : "outline"}
+                    className={classNames({
+                      "bg-[#306844] text-[hsl(var(--success-foreground))] transition-colors hover:bg-[#2c4c3b]":
+                        isToday,
+                    })}
                   >
-                    {shareMessage}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </CardDescription>
-          </CardContent>
-        </Card>
-      </SheetTrigger>
+                    {formattedDate}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="w-80 max-w-80">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className="max-w-80 truncate pr-10">
+                        {shareMessage}
+                      </TooltipTrigger>
+                      <TooltipContent
+                        align="start"
+                        className="max-w-80 select-none"
+                      >
+                        {shareMessage}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </CardDescription>
+              </CardContent>
+            </Card>
+          </SheetTrigger>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem onClick={() => deleteRaidMutate(_id)}>
+            Remover Raid
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
 
       {/* Sheet com formulário */}
       <SheetContent className="w-[400px] overflow-y-auto sm:w-[540px]">
         <SheetHeader>
           <SheetTitle className="select-none">Editar Raid</SheetTitle>
         </SheetHeader>
-        <div className="min-h-full px-1 mt-4 space-y-4">
+        <div className="mt-4 min-h-full space-y-4 px-1">
           <div className="space-y-1">
             <Label className="select-none">Plataforma</Label>
             <Input
@@ -206,7 +250,7 @@ const RaidCard = ({
 
             <Textarea
               id="content"
-              className="w-full h-48 p-2 text-sm rounded-xl"
+              className="h-48 w-full rounded-xl p-2 text-sm"
               value={editedRaid.content}
               onChange={onChange}
               placeholder="Type your markdown here..."
@@ -223,12 +267,10 @@ const RaidCard = ({
           </div>
         </div>
 
-        <SheetFooter className="pt-4 pr-1 mt-auto select-none">
-          <SheetClose asChild>
-            <Button type="submit" className="rounded-xl" onClick={updateRaid}>
-              Enviar
-            </Button>
-          </SheetClose>
+        <SheetFooter className="mt-auto select-none pr-1 pt-4">
+          <Button type="submit" className="rounded-xl" onClick={updateRaid}>
+            Enviar
+          </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>

@@ -93,8 +93,8 @@ const CreateRaidSheet = () => {
 
   return (
     <Sheet>
-      <SheetTrigger asChild className="w-full text-center">
-        <p className="z-[30] mb-4 inline-flex h-10 select-none items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-2xl font-medium transition-colors hover:cursor-pointer hover:bg-transparent hover:font-bold hover:underline focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 dark:hover:text-slate-50">
+      <SheetTrigger asChild>
+        <p className="z-[30] my-4 inline-flex h-10 select-none items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-2xl font-medium transition-colors hover:cursor-pointer hover:bg-transparent hover:font-bold hover:underline focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 dark:hover:text-slate-50">
           [Criar um novo Raid]
         </p>
       </SheetTrigger>
@@ -103,7 +103,7 @@ const CreateRaidSheet = () => {
           <SheetTitle className="select-none">Criar novo Raid</SheetTitle>
         </SheetHeader>
 
-        <div className="min-h-full px-1 mt-4 space-y-4">
+        <div className="mt-4 min-h-full space-y-4 px-1">
           <div className="space-y-1">
             <Label className="select-none">Plataforma</Label>
             <Input id="platform" onChange={onChange} className="rounded-xl" />
@@ -130,7 +130,7 @@ const CreateRaidSheet = () => {
             <Textarea
               id="content"
               onChange={onChange}
-              className="w-full h-48 p-2 text-sm rounded-xl"
+              className="h-48 w-full rounded-xl p-2 text-sm"
               placeholder="Type your markdown here..."
             />
           </div>
@@ -145,7 +145,7 @@ const CreateRaidSheet = () => {
           </div>
         </div>
 
-        <SheetFooter className="pt-4 pr-1 mt-auto select-none">
+        <SheetFooter className="mt-auto select-none pr-1 pt-4">
           <SheetClose asChild>
             <Button type="submit" className="rounded-xl" onClick={registerRaid}>
               Enviar

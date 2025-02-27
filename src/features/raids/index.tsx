@@ -3,36 +3,52 @@ import classNames from "classnames";
 import { useRaids } from "./api/getRaids";
 import CreateRaidSheet from "./components/CreateRaidSheet";
 import RaidCard from "./components/RaidCard";
+import RaidSkeleton from "./components/RaidSkeleton";
 
 const Raids = () => {
-  const { data: raids } = useRaids();
+  const { data: raids, isLoading, isError } = useRaids();
 
   return (
     <div
       className={classNames({
-        "flex flex-wrap gap-4 p-4": true,
-        "justify-between": raids && raids?.length >= 4,
+        "flex flex-col gap-2 p-2": true,
+        "justify-evenly": raids && raids?.length >= 4,
       })}
     >
-      <CreateRaidSheet />
+      <div className="w-full grow text-center">
+        <CreateRaidSheet />
+      </div>
 
-      {raids &&
-        raids
-          .sort(
-            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-          )
-          .reverse()
-          .map((raid) => (
-            <RaidCard
-              key={raid._id}
-              _id={raid._id}
-              date={raid.date}
-              platform={raid.platform}
-              url={raid.url}
-              shareMessage={raid.shareMessage}
-              content={raid.content}
-            />
+      <div className="flex w-full flex-wrap justify-evenly gap-y-4">
+        {raids &&
+          raids
+            .sort(
+              (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+            )
+            .reverse()
+            .map((raid) => (
+              <RaidCard
+                key={raid._id}
+                _id={raid._id}
+                date={raid.date}
+                platform={raid.platform}
+                url={raid.url}
+                shareMessage={raid.shareMessage}
+                content={raid.content}
+              />
+            ))}
+
+        {isLoading &&
+          Array.from({ length: 12 }).map((_, index) => (
+            <RaidSkeleton key={index} />
           ))}
+
+        {isError && !isLoading && (
+          <p className="w-full select-none text-center">
+            Nenhum Raid encontrado.
+          </p>
+        )}
+      </div>
     </div>
   );
 };
