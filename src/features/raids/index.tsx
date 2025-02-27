@@ -49,7 +49,7 @@ const Raids = () => {
           ))}
 
         {isError && !isLoading && (
-          <p className="w-full select-none text-center">
+          <p className="w-full select-none text-center text-sm">
             Nenhum Raid encontrado.
           </p>
         )}
