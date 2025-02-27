@@ -19,6 +19,11 @@ const Raids = () => {
         <CreateRaidSheet />
       </div>
 
+      {/* <menu className="flex items-center justify-center h-12 gap-2 m-4 mt-0 border select-none rounded-xl">
+        <span>todos 12</span>
+        <span>passados 3</span>
+      </menu> */}
+
       <div className="flex w-full flex-wrap justify-evenly gap-y-4">
         {raids &&
           raids
