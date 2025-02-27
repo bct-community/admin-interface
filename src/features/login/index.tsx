@@ -5,7 +5,7 @@ import {
   ShieldCheck,
   ShieldX,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -18,18 +18,25 @@ import { useLogin } from "./api/useLogin";
 
 const Login = () => {
   const [auth, setAuth] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
 
   const { user } = useAuth();
-
-  const [showPassword, setShowPassword] = useState(false);
   const { mutate, isError, isSuccess, isPending, data } = useLogin();
   const { saveAccessToken } = useTokenStorage();
   const navigate = useNavigate();
 
-  if (isSuccess) {
-    saveAccessToken(data.token);
-    navigate("/raids");
-  }
+  useEffect(() => {
+    if (user) {
+      navigate("/raids", { replace: true });
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
+    if (isSuccess && data?.token) {
+      saveAccessToken(data.token);
+      navigate("/raids", { replace: true });
+    }
+  }, [isSuccess, data, saveAccessToken, navigate]);
 
   const submitCredentials = () => {
     mutate(auth);
@@ -41,10 +48,6 @@ const Login = () => {
       [e.target.id]: e.target.value,
     }));
   };
-
-  if (user) {
-    navigate("/raids");
-  }
 
   return (
     <div className="flex items-center justify-center min-h-screen">
