@@ -12,10 +12,10 @@ export const Router = () => {
       <AuthProvider>
         <ScrollToTop />
         <Routes>
-          <Route path="/" element={<Layout />}>
-            {/* <Route path="/" element={<Login />} /> */}
+          <Route path="/" element={<Login />} />
 
-            <Route path="/" element={<Raids />} />
+          <Route path="/" element={<Layout />}>
+            <Route path="/raids" element={<Raids />} />
             <Route
               path="/links"
               element={<ProtectedRoute element={<Links />} />}
@@ -24,9 +24,9 @@ export const Router = () => {
               path="/arts"
               element={<ProtectedRoute element={<Arts />} />}
             />
-
-            <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

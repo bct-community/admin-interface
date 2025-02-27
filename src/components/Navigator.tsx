@@ -6,7 +6,7 @@ const Navigator = () => {
   const location = useLocation().pathname;
 
   return (
-    <nav className="flex w-full items-center justify-between border-b p-4 px-8">
+    <nav className="flex items-center justify-between w-full p-4 px-8 border-b">
       <Shield />
 
       <div className="flex gap-4">
@@ -29,10 +29,10 @@ const Navigator = () => {
           Links
         </Link>
         <Link
-          to="/raids"
+          to="/arts"
           className={classNames({
             "text-sm hover:underline": true,
-            "text-[var(--coin-pink)]": location === "/raids",
+            "text-[var(--coin-pink)]": location === "/arts",
           })}
         >
           Arts

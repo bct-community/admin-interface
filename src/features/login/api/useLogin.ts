@@ -8,14 +8,21 @@ const fetchLogin = async ({
 }: {
   email: string;
   password: string;
-}) =>
-  await fetch(env.VITE_API_URL + "/auth", {
+}) => {
+  const response = await fetch(env.VITE_API_URL + "/auth", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ email, password }),
   });
+
+  if (!response.ok) throw new Error("Login failed");
+
+  const json = await response.json();
+
+  return json as { token: string };
+};
 
 export const useLogin = () => {
   return useMutation({
