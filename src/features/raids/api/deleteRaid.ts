@@ -1,10 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 
-import env from "@/config";
+import { customFetch } from "@/providers/auth";
 
 const deleteRaid = async (raidId: string) => {
-  const response = await fetch(`${env.VITE_API_URL}/raids/${raidId}`, {
-    method: "DELETE",
+  const response = await customFetch({
+    endpoint: `/raids/${raidId}`,
+    options: {
+      method: "DELETE",
+    },
   });
 
   if (!response.ok) {

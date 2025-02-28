@@ -1,15 +1,15 @@
 import { useMutation } from "@tanstack/react-query";
 
-import env from "@/config";
+import { customFetch } from "@/providers/auth";
 
 import { Raid } from "./getRaids";
 
 const registerRaid = async (raid: Omit<Raid, "_id">) => {
-  const response = await fetch(`${env.VITE_API_URL}/raids`, {
-    method: "POST",
-    body: JSON.stringify(raid),
-    headers: {
-      "Content-Type": "application/json",
+  const response = await customFetch({
+    endpoint: `/raids`,
+    options: {
+      method: "POST",
+      body: JSON.stringify(raid),
     },
   });
 

@@ -1,17 +1,17 @@
 import { useMutation } from "@tanstack/react-query";
 
-import env from "@/config";
+import { customFetch } from "@/providers/auth";
 
 import { Raid, RaidSchema } from "./getRaids";
 
 const updateRaid = async (raid: Raid) => {
   const { _id, ...updatedRaid } = RaidSchema.parse(raid);
 
-  const response = await fetch(`${env.VITE_API_URL}/raids/${_id}`, {
-    method: "PUT",
-    body: JSON.stringify(updatedRaid),
-    headers: {
-      "Content-Type": "application/json",
+  const response = await customFetch({
+    endpoint: `/raids/${_id}`,
+    options: {
+      method: "PUT",
+      body: JSON.stringify(updatedRaid),
     },
   });
 

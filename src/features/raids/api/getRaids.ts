@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 
-import env from "@/config";
+import { customFetch } from "@/providers/auth";
 
 export const RaidSchema = z.object({
   _id: z.string(),
@@ -17,7 +17,12 @@ export type Raid = z.infer<typeof RaidSchema>;
 export type Raids = Raid[];
 
 const getRaids = async () => {
-  const response = await fetch(`${env.VITE_API_URL}/raids`);
+  console.log("getRaids called");
+
+  const response = await customFetch({
+    endpoint: "/raids",
+    options: { method: "GET" },
+  });
 
   const data = await response.json();
 

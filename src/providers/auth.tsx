@@ -6,6 +6,8 @@ import {
   useState,
 } from "react";
 
+import env from "@/config";
+
 type AuthContextData = {
   token: string | null;
   tokenExpiration: string | null;
@@ -25,6 +27,38 @@ interface AuthProviderProps {
 function decodedToken(token: string) {
   const [, payload] = token.split(".");
   return JSON.parse(atob(payload));
+}
+
+export async function customFetch({
+  endpoint,
+  options = {},
+}: {
+  endpoint: string;
+  options: RequestInit;
+}): Promise<Response> {
+  const token = localStorage.getItem("token");
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...((options.headers as Record<string, string>) || {}),
+  };
+
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const fetchOptions: RequestInit = {
+    ...options,
+    headers,
+  };
+
+  const response = await fetch(env.VITE_API_URL + endpoint, fetchOptions);
+
+  if (response.status === 401) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("token_expiration");
+    window.location.href = "/";
+  }
+
+  return response;
 }
 
 // AuthProvider will be used to store the token and expiration date on localStorage
