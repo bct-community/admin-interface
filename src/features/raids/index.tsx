@@ -15,7 +15,7 @@ const Raids = () => {
         "justify-evenly": raids && raids?.length >= 4,
       })}
     >
-      <div className="w-full grow text-center">
+      <div className="w-full text-center grow">
         <CreateRaidSheet />
       </div>
 
@@ -24,7 +24,7 @@ const Raids = () => {
         <span>passados 3</span>
       </menu> */}
 
-      <div className="flex w-full flex-wrap justify-evenly gap-y-4">
+      <div className="flex flex-wrap w-full justify-evenly gap-y-4">
         {raids &&
           raids
             .sort(
@@ -49,7 +49,7 @@ const Raids = () => {
           ))}
 
         {isError && !isLoading && (
-          <p className="w-full select-none text-center text-sm">
+          <p className="w-full text-sm text-center select-none">
             Nenhum Raid encontrado.
           </p>
         )}
