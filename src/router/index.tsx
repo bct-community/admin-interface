@@ -15,7 +15,10 @@ export const Router = () => {
           <Route path="/" element={<Login />} />
 
           <Route path="/" element={<Layout />}>
-            <Route path="/raids" element={<Raids />} />
+            <Route
+              path="/raids"
+              element={<ProtectedRoute element={<Raids />} />}
+            />
             <Route
               path="/links"
               element={<ProtectedRoute element={<Links />} />}

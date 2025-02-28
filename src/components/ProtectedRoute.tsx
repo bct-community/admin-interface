@@ -1,42 +1,33 @@
-import React, { useEffect, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import { isAccessTokenExpiredSync, useAuth } from "@/providers/auth";
+import { useAuth } from "@/providers/auth";
 
 interface ProtectedRouteProps {
   element: React.ReactElement;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element }) => {
-  const { user, isAccessTokenExpired, logout } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-
-  const location = useLocation();
-  const pathname = location.pathname;
+function ProtectedRoute({ element }: ProtectedRouteProps) {
+  const { loading, isTokenValid, checkTokenValidity, removeToken } = useAuth();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    const isExpired = isAccessTokenExpiredSync();
+    if (!loading) {
+      const stillValid = checkTokenValidity();
 
-    const checkToken = async () => {
-      if (isAccessTokenExpired || isExpired) {
-        await logout();
+      if (!stillValid) {
+        removeToken();
+        navigate("/login", { replace: true });
       }
+    }
+  }, [pathname, loading, checkTokenValidity, removeToken, navigate]);
 
-      setIsLoading(false);
-    };
+  if (loading) return null;
 
-    checkToken();
-  }, [isAccessTokenExpired, pathname]);
-
-  if (isLoading) {
-    return "loading...";
-  }
-
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
+  if (!isTokenValid) return null;
 
   return element;
-};
+}
 
 export default ProtectedRoute;

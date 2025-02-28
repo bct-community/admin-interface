@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useTokenStorage } from "@/hooks/useTokenStorage";
 import { useAuth } from "@/providers/auth";
 
 import { useLogin } from "./api/useLogin";
@@ -20,23 +19,17 @@ const Login = () => {
   const [auth, setAuth] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
 
-  const { user } = useAuth();
+  const { isTokenValid, saveToken } = useAuth();
   const { mutate, isError, isSuccess, isPending, data } = useLogin();
-  const { saveAccessToken } = useTokenStorage();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
-      navigate("/raids", { replace: true });
-    }
-  }, [user, navigate]);
+    if (isTokenValid) navigate("/links", { replace: true });
+  }, [isTokenValid, navigate]);
 
   useEffect(() => {
-    if (isSuccess && data?.token) {
-      saveAccessToken(data.token);
-      navigate("/raids", { replace: true });
-    }
-  }, [isSuccess, data, saveAccessToken, navigate]);
+    if (isSuccess && data?.token) saveToken(data.token);
+  }, [isSuccess, data, navigate]);
 
   const submitCredentials = () => {
     mutate(auth);
