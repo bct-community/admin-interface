@@ -6,7 +6,7 @@ const Navigator = () => {
   const location = useLocation().pathname;
 
   return (
-    <nav className="flex items-center justify-between w-full p-4 px-8 border-b">
+    <nav className="flex items-center justify-between w-full p-4 px-8 border-b select-none">
       <Shield />
 
       <div className="flex gap-4">
