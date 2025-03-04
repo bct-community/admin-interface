@@ -1,10 +1,12 @@
+import { Skeleton } from "@/components/ui/skeleton";
+
 import { useLinks } from "./api/getLinks";
 import CreateLinkSheet from "./components/CreateLinkSheet";
 import Link from "./components/Link";
 import LinkSkeleton from "./components/LinkSkeleton";
 
 const Links = () => {
-  const { data: links, isLoading } = useLinks();
+  const { data: links, isLoading, isError } = useLinks();
 
   const communityLinks =
     links?.filter((link) => link.type === "community-links") || [];
@@ -16,8 +18,19 @@ const Links = () => {
     <div className="flex flex-col items-center justify-center px-4 mt-6 item">
       <CreateLinkSheet />
 
+      {isError && !isLoading && (
+        <p className="w-full text-sm text-center select-none">
+          Nenhum Link encontrado.
+        </p>
+      )}
+
       <div className="w-full max-w-[700px]">
-        <h2 className="mt-4 text-xl font-bold select-none">🌐 Comunidade</h2>
+        {isLoading && <Skeleton className="mt-4 h-4 w-[250px]" />}
+
+        {!isLoading && !isError && (
+          <h2 className="mt-4 text-xl font-bold select-none">🌐 Comunidade</h2>
+        )}
+
         {isLoading
           ? Array.from({ length: 3 }).map((_v, i) => <LinkSkeleton key={i} />)
           : communityLinks.map(({ _id, label, url, icon, type }, index) => (
@@ -31,7 +44,12 @@ const Links = () => {
               />
             ))}
 
-        <h2 className="mt-4 text-xl font-bold select-none">💰 Token</h2>
+        {isLoading && <Skeleton className="mt-4 h-4 w-[250px]" />}
+
+        {!isLoading && !isError && (
+          <h2 className="mt-4 text-xl font-bold select-none">💰 Token</h2>
+        )}
+
         {isLoading
           ? Array.from({ length: 5 }).map((_v, i) => <LinkSkeleton key={i} />)
           : tokenLinks.map(({ _id, label, url, icon, type }, index) => (

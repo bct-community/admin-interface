@@ -1,14 +1,18 @@
 import { Outlet } from "react-router-dom";
 
+import Footer from "./Footer";
 import Navigator from "./Navigator";
 
 const Layout = () => {
   return (
-    <div className="relative flex min-h-screen w-full flex-col">
+    <div className="relative flex flex-col w-full min-h-screen">
       <Navigator />
-      <div className="parent-component-that-already-fills-the-whole-screen flex h-full flex-1 flex-col">
+
+      <div className="flex flex-col flex-1 h-full">
         <Outlet />
       </div>
+
+      <Footer />
     </div>
   );
 };

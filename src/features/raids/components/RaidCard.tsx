@@ -24,7 +24,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
@@ -161,10 +160,10 @@ const RaidCard = ({
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <SheetTrigger asChild>
-            <Card className="h-32 min-h-32 w-80 select-none hover:cursor-pointer">
+            <Card className="h-32 select-none min-h-32 w-80 hover:cursor-pointer">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between space-x-2">
-                  <span className="max-w-fit grow truncate">{platform}</span>
+                  <span className="truncate max-w-fit grow">{platform}</span>
                   <Badge
                     variant={isPast ? "destructive" : "outline"}
                     className={classNames({
@@ -180,12 +179,12 @@ const RaidCard = ({
                 <CardDescription className="w-80 max-w-80">
                   <TooltipProvider>
                     <Tooltip>
-                      <TooltipTrigger className="max-w-80 truncate pr-10">
+                      <TooltipTrigger className="pr-10 truncate max-w-80">
                         {shareMessage}
                       </TooltipTrigger>
                       <TooltipContent
                         align="start"
-                        className="max-w-80 select-none"
+                        className="select-none max-w-80"
                       >
                         {shareMessage}
                       </TooltipContent>
@@ -208,7 +207,7 @@ const RaidCard = ({
         <SheetHeader>
           <SheetTitle className="select-none">Editar Raid</SheetTitle>
         </SheetHeader>
-        <div className="mt-4 min-h-full space-y-4 px-1">
+        <div className="min-h-full px-1 mt-4 space-y-4">
           <div className="space-y-1">
             <Label className="select-none">Plataforma</Label>
             <Input
@@ -250,7 +249,7 @@ const RaidCard = ({
 
             <Textarea
               id="content"
-              className="h-48 w-full rounded-xl p-2 text-sm"
+              className="w-full h-48 p-2 text-sm rounded-xl"
               value={editedRaid.content}
               onChange={onChange}
               placeholder="Type your markdown here..."
@@ -267,7 +266,7 @@ const RaidCard = ({
           </div>
         </div>
 
-        <SheetFooter className="mt-auto select-none pr-1 pt-4">
+        <SheetFooter className="pt-4 pr-1 mt-auto select-none">
           <Button type="submit" className="rounded-xl" onClick={updateRaid}>
             Enviar
           </Button>

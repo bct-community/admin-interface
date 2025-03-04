@@ -24,7 +24,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isTokenValid) navigate("/links", { replace: true });
+    if (isTokenValid) navigate("/raids", { replace: true });
   }, [isTokenValid, navigate]);
 
   useEffect(() => {
