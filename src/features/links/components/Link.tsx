@@ -134,7 +134,7 @@ const Link = ({ icon, url, _id, label, type }: LinkProps) => {
                 className="rounded border p-1.5 hover:bg-accent hover:text-accent-foreground"
                 onClick={openLink}
               >
-                {IconMap[icon](16)}
+                <IconMap icon={icon} size={16} />
               </button>
 
               <p className="pl-2 overflow-hidden text-sm truncate shrink grow text-ellipsis whitespace-nowrap hover:cursor-pointer hover:underline">
@@ -189,7 +189,10 @@ const Link = ({ icon, url, _id, label, type }: LinkProps) => {
             <Select
               value={editedLink.type}
               onValueChange={(value) =>
-                setEditedLink((prev) => ({ ...prev, type: value as "community-links" | "official-links" }))
+                setEditedLink((prev) => ({
+                  ...prev,
+                  type: value as "community-links" | "official-links",
+                }))
               }
             >
               <SelectTrigger className="rounded-xl">

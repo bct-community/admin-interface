@@ -16,8 +16,10 @@ WebFont.load({
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
-  <QueryClientProvider client={queryClient}>
-    <Toaster />
-    <App />
-  </QueryClientProvider>,
+  <StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <Toaster />
+      <App />
+    </QueryClientProvider>
+  </StrictMode>,
 );
