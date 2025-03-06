@@ -77,6 +77,8 @@ const CreateRaidSheet = () => {
     }
 
     const parsedDate = parse(raid.date, "dd/MM/yyyy", new Date());
+    parsedDate.setUTCHours(0, 0, 0, 0);
+    
     if (isNaN(parsedDate.getTime())) {
       toast({
         title: "Data inválida.",
@@ -103,7 +105,7 @@ const CreateRaidSheet = () => {
           <SheetTitle className="select-none">Criar novo Raid</SheetTitle>
         </SheetHeader>
 
-        <div className="mt-4 min-h-full space-y-4 px-1">
+        <div className="min-h-full px-1 mt-4 space-y-4">
           <div className="space-y-1">
             <Label className="select-none">Plataforma</Label>
             <Input id="platform" onChange={onChange} className="rounded-xl" />
@@ -130,7 +132,7 @@ const CreateRaidSheet = () => {
             <Textarea
               id="content"
               onChange={onChange}
-              className="h-48 w-full rounded-xl p-2 text-sm"
+              className="w-full h-48 p-2 text-sm rounded-xl"
               placeholder="Type your markdown here..."
             />
           </div>
@@ -145,7 +147,7 @@ const CreateRaidSheet = () => {
           </div>
         </div>
 
-        <SheetFooter className="mt-auto select-none pr-1 pt-4">
+        <SheetFooter className="pt-4 pr-1 mt-auto select-none">
           <SheetClose asChild>
             <Button type="submit" className="rounded-xl" onClick={registerRaid}>
               Enviar

@@ -141,6 +141,8 @@ const RaidCard = ({
     }
 
     const parsedDate = parse(editedRaid.date, "dd/MM/yyyy", new Date());
+    parsedDate.setUTCHours(0, 0, 0, 0);
+
     if (isNaN(parsedDate.getTime())) {
       toast({
         title: "Data inválida.",
